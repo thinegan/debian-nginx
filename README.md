@@ -11,6 +11,9 @@ Dockerized nginx service, built on top of official [Debian](https://hub.docker.c
 * supervisor
 * nginx - v1.11.13
 
+# Logs (stderr & stdout)
+* /var/log/supervisor
+
 # Config:
 * Dependencies Package:
   * bzip2
