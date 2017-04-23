@@ -34,7 +34,7 @@ Dockerized nginx service, built on top of official [Debian](https://hub.docker.c
 
 # Run example
 ```console
-$docker-compose build
+$docker-compose pull
 $docker-compose up -d
 
 CONTAINER ID        IMAGE                   COMMAND                  CREATED             STATUS              PORTS                                      NAMES
