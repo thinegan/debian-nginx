@@ -8,7 +8,6 @@ Dockerized nginx service, built on top of official [Debian](https://hub.docker.c
 * [8.7, 8, jessie, latest (jessie/Dockerfile)](https://github.com/tianon/docker-brew-debian/blob/e8131d071a42b8e88cabbb0aa33023c7b66b7b93/jessie/Dockerfile)
 
 # Image specific:
-* supervisor
 * nginx - v1.11.13
 
 # Logs (stderr & stdout)
