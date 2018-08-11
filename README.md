@@ -9,6 +9,7 @@ Dockerized nginx service, built on top of official [Debian](https://hub.docker.c
 
 # Image specific:
 * nginx - v1.11.13
+* supervisor
 
 # Logs (stderr & stdout)
 * /var/log/supervisor
