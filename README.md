@@ -1,5 +1,5 @@
 # debian-nginx
-Dockerized nginx service, built on top of official [Debian](https://hub.docker.com/_/debian/) images with supervisor.
+Dockerized nginx service, built on top of official [Debian](https://hub.docker.com/_/debian/) images.
 
 # Image tags
 * thinegan/debian-nginx (Debian GNU/Linux 8)
