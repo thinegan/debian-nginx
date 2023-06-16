@@ -19,15 +19,14 @@ steps:
     depth: 1
     git: "git-thinegan-cf"
 
-  # build:
-  #   stage: "prepare"
-  #   title: "Building Docker image"
-  #   type: "build"
-  #   image_name: "thinegan/debian-nodejs"
-  #   working_directory: "${{clone}}/docker"
-  #   tag: "latest"
-  #   dockerfile: Dockerfile
-  #   disable_push: true
+  build:
+    stage: "prepare"
+    title: "Building Docker image"
+    type: "build"
+    image_name: "thinegan/debian-nginx"
+    working_directory: "${{clone}}/docker"
+    dockerfile: Dockerfile
+    disable_push: true
 
   # push:
   #   stage: "prepare"
