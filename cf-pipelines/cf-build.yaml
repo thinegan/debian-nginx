@@ -32,7 +32,7 @@ steps:
     stage: "prepare"
     title: "Pushing Docker image to Docker hub"
     type: push
-    image_name: "thinegan/debian-nodejs"
+    image_name: "thinegan/debian-nginx"
     tag: "mainline-bullseye"
     registry: mydockerhub1
     candidate: ${{build}}
