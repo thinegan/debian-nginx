@@ -20,7 +20,7 @@ steps:
     git: "git-thinegan-cf"
 
   ReleaseVariables:
-    stage: prepare/builds
+    stage: "prepare"
     image: anthonyzou/alpine-build-essentials:latest
     working_directory: "${{clone}}"
     commands:
