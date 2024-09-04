@@ -1,5 +1,5 @@
 # FROM nginx:mainline-bullseye
-FROM nginx:mainline-bookworm
+FROM nginx:mainline-alpine
 MAINTAINER Thinegan Ratnam <thinegan@thinegan.com>
 
 RUN apt-get update && apt-get install -y supervisor
