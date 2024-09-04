@@ -19,38 +19,60 @@ steps:
     depth: 1
     git: "git-thinegan-cf"
 
+  ReleaseVariables:
+    stage: prepare/builds
+    image: anthonyzou/alpine-build-essentials:latest
+    working_directory: "${{clone}}"
+    commands:
+      - cf_export RELEASE_IMAGE_TAG="${{CF_SHORT_REVISION}}"
+      - cf_export RELEASE_DISTRO_TAG="mainline-bullseye"
+      - cf_export ECR_IMAGE_REPO=thinegan/debian-nginx
+      - cf_export APP_NAME=templateapi
+      - cf_export APP_REPO="https://github.com/crytera/templateapi.git"
+      - cf_export APP_PROJECT="product"
+      - cf_export APP_DOMAINCERT="*.crytera.com"
+
   build:
     stage: "prepare"
     title: "Building Docker image"
     type: "build"
     image_name: "thinegan/debian-nginx"
     working_directory: "${{clone}}/docker"
+    tags: [ 'latest', '${{RELEASE_DISTRO_TAG}}', '${{RELEASE_IMAGE_TAG}}']
     dockerfile: Dockerfile
     disable_push: true
 
-  FetchSnykSecrets:
+  push:
     stage: "prepare"
-    title: Fetch secrets from AWS Secrets Manager
-    type: aws-secrets-manager:1.0.1
-    arguments:
-      AWS_ACCESS_KEY_ID: '${{AWS_ACCESS_KEY_ID}}'
-      AWS_SECRET_ACCESS_KEY: '${{AWS_SECRET_ACCESS_KEY}}'
-      AWS_DEFAULT_REGION: '${{AWS_DEFAULT_REGION}}'
-      secrets:
-        - secret_arn: '${{SNYK_STAG_SECRET_ARN}}'
-          key: SNYK_ORG_NAME
-          store_in: SNYK_ORG_NAME_ARN
-        - secret_arn: '${{SNYK_STAG_SECRET_ARN}}'
-          key: SNYK_AUTH_TOKEN
-          store_in: SNYK_AUTH_TOKEN_ARN
+    title: "Pushing Docker image to Docker hub"
+    type: push
+    image_name: "thinegan/debian-nginx"
+    tags: [ 'latest', '${{RELEASE_DISTRO_TAG}}', '${{RELEASE_IMAGE_TAG}}']
+    registry: mydockerhub1
+    candidate: ${{build}}
 
-  # push:
-  #   stage: "prepare"
-  #   title: "Pushing Docker image to Docker hub"
-  #   type: push
-  #   image_name: "thinegan/debian-nginx"
-  #   tag: "mainline-bullseye"
-  #   registry: mydockerhub1
-  #   candidate: ${{build}}
-
+  MySnykContainer:
+    stage: "prepare"
+    title: Snyk Container Vulnerable Check
+    image: snyk/snyk:docker
+    working_directory: "${{clone}}/docker"
+    fail_fast: false
+    environment:
+      - SNYK_TOKEN=${{SNYK_AUTH_TOKEN}}
+      - SNYK_ORG=${{SNYK_ORG_NAME}}
+      - SNYK_API_ENDPOINT="https://snyk.io/"
+    commands:
+      - snyk auth $SNYK_TOKEN
+      - snyk container monitor --project-name=${{ECR_IMAGE_REPO}} --severity-threshold=high --file=Dockerfile ${{ECR_IMAGE_REPO}}:${{RELEASE_IMAGE_TAG}}  --exclude-app-vulns
+      - snyk container test --severity-threshold=high --file=Dockerfile ${{ECR_IMAGE_REPO}}:${{RELEASE_IMAGE_TAG}}  --exclude-app-vulns
+    on_success:
+      metadata:
+        set:
+          - '${{build.imageId}}':
+            - CF_QUALITY: true
+    on_fail:
+      metadata:
+        set:
+          - '${{build.imageId}}':
+            - CF_QUALITY: false
 # Debug mode 4
