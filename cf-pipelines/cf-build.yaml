@@ -5,7 +5,7 @@ version: "1.0"
 stages:
   - prepare
   - build
-  - scan
+  - security
   - test
   - release
 
@@ -28,13 +28,29 @@ steps:
     dockerfile: Dockerfile
     disable_push: true
 
-  push:
+  FetchSnykSecrets:
     stage: "prepare"
-    title: "Pushing Docker image to Docker hub"
-    type: push
-    image_name: "thinegan/debian-nginx"
-    tag: "mainline-bullseye"
-    registry: mydockerhub1
-    candidate: ${{build}}
+    title: Fetch secrets from AWS Secrets Manager
+    type: aws-secrets-manager:1.0.1
+    arguments:
+      AWS_ACCESS_KEY_ID: '${{AWS_ACCESS_KEY_ID}}'
+      AWS_SECRET_ACCESS_KEY: '${{AWS_SECRET_ACCESS_KEY}}'
+      AWS_DEFAULT_REGION: '${{AWS_DEFAULT_REGION}}'
+      secrets:
+        - secret_arn: '${{SNYK_STAG_SECRET_ARN}}'
+          key: SNYK_ORG_NAME
+          store_in: SNYK_ORG_NAME_ARN
+        - secret_arn: '${{SNYK_STAG_SECRET_ARN}}'
+          key: SNYK_AUTH_TOKEN
+          store_in: SNYK_AUTH_TOKEN_ARN
+
+  # push:
+  #   stage: "prepare"
+  #   title: "Pushing Docker image to Docker hub"
+  #   type: push
+  #   image_name: "thinegan/debian-nginx"
+  #   tag: "mainline-bullseye"
+  #   registry: mydockerhub1
+  #   candidate: ${{build}}
 
 # Debug mode 3
